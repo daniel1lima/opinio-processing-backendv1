@@ -14,10 +14,14 @@ import { Webhook } from "svix";
 import ClerkUser from "./models/ClerkUser.js";
 
 // Data imports
-import User from "./models/User.js";
+
 import { dataUser, dataTransaction, dataCompanies } from "./data/index.js";
+import { reviewsData } from "./data/reviews.js";
+import { reviewSummaries } from "./data/summaries.js";
 import Transaction from "./models/Transaction.js";
 import Company from "./models/Company.js";
+import Review from "./models/Review.js";
+import ReviewSummary from "./models/ReviewSummary.js";
 
 // Config
 
@@ -121,6 +125,8 @@ mongoose
     console.log("Connected to DB");
     //  app.listen(PORT, () => console.log(`Server Port: ${PORT}`));
     //  Only add once
+    // ReviewSummary.insertMany(reviewSummaries)
+    // Review.insertMany(reviewsData)
     //  User.insertMany(dataUser);
     // Transaction.insertMany(dataTransaction);
     // Company.insertMany(dataCompanies);

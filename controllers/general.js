@@ -1,6 +1,7 @@
-import ClerkUser from "../models/ClerkUser.js";
+import User from "../models/User.js";
 import Company from "../models/Company.js";
 import Reviews from "../models/Reviews.js"
+
 
 export const getUser = async (req, res) => {
   try {
@@ -16,9 +17,17 @@ export const getUser = async (req, res) => {
 export const getCompanyId = async (req, res) => {
   try {
     const { comp_id } = req.params;
-    const company = await Company.findOne({ company_id: comp_id });
-    console.log(company)
-    res.status(200).json(company);
+
+    const company = new Company();
+    const result = await company.fetchCompanyItemById(comp_id);
+    if (!result) {
+      res.status(400).json({ message: "Company not found" });
+    } else {
+      console.log(result);
+      res.status(200).json(result);
+    }
+
+
   } catch (error) {
     res.status(404).json({ message: error.message });
   }

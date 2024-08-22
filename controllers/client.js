@@ -72,7 +72,7 @@ export const getFrequencyReviewsByCompId = async (req, res) => {
       week[dayKey] = (week[dayKey] || 0) + 1;
 
       // Month: Week by week
-      month[weekKey] = (month[weekKey] || 0) + 1;
+      month[`Week ${weekKey}`] = (month[`week_${weekKey}`] || 0) + 1;
 
       // Year: Month by Month
       year[monthKey] = (year[monthKey] || 0) + 1;

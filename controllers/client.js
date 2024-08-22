@@ -1,6 +1,7 @@
-
-import Review from '../models/Review.js';
 import ReviewSummary from '../models/ReviewSummary.js';
+import Reviews from '../models/Reviews.js'; // Ensure to import the Reviews class
+
+const reviewsModel = new Reviews(); // Create an instance of the Reviews class
 
 
 export const getAllReviews = async (req, res) => {
@@ -21,34 +22,68 @@ export const getAllReviews = async (req, res) => {
 
 export const getReviewsByCompId = async (req, res) => {
   try {
+    const companyId = req.query.company_id;
+    const page = parseInt(req.query.page) || 1; // Default to page 1
+    const pageSize = parseInt(req.query.page_size) || 10; // Default to 10 items per page
 
-    const companyId = req.query.comp_id;
-
-    const reviews = await Review.find({ company_id: companyId }).select("-bert_embeddings");
-
+    // Use the fetchAllReviewsByCompanyId method with pagination
+    const reviews = await reviewsModel.fetchAllReviewsByCompanyId(companyId, page, pageSize);
+    
     if (reviews.length === 0) {
       return res.status(404).json({ error: "No reviews found for the company ID provided." });
     }
 
-    res.status(200).json(reviews);
+    // Get total count of reviews for pagination
+    const totalReviews = await reviewsModel.countReviewsByCompanyId(companyId);
+
+    res.status(200).json({
+      totalReviews,
+      page,
+      pageSize,
+      reviews,
+    });
   } catch (error) {
     res.status(404).json({ message: error.message });
   }
 };
 
-export const getSummariesByCompId = async (req, res) => {
-  console.log("called")
+export const getFrequencyReviewsByCompId = async (req, res) => {
   try {
+    const companyId = req.query.company_id;
+    const reviews = await reviewsModel.fetchAllReviewsByCompanyId(companyId);
 
-    const companyId = req.query.comp_id;
+    // Initialize frequency objects
+    const allTime = {};
+    const week = {};
+    const month = {};
+    const year = {};
 
-    const reviews = await ReviewSummary.find({ company_id: companyId })
+    reviews.forEach(review => {
+      const date = new Date(review.review_date); // Assuming review has a date field
+      const yearKey = date.getFullYear();
+      const monthKey = date.toLocaleString('default', { month: 'long' });
+      const weekKey = Math.ceil(date.getDate() / 7);
+      const dayKey = date.toLocaleString('default', { weekday: 'long' });
 
-    if (reviews.length === 0) {
-      return res.status(404).json({ error: "No summaries found for the company ID provided." });
-    }
+      // All Time: Yearly breakdown
+      allTime[yearKey] = (allTime[yearKey] || 0) + 1;
 
-    res.status(200).json(reviews);
+      // Week: Monday through Sunday
+      week[dayKey] = (week[dayKey] || 0) + 1;
+
+      // Month: Week by week
+      month[weekKey] = (month[weekKey] || 0) + 1;
+
+      // Year: Month by Month
+      year[monthKey] = (year[monthKey] || 0) + 1;
+    });
+
+    res.status(200).json({
+      allTime,
+      week,
+      month,
+      year,
+    });
   } catch (error) {
     res.status(404).json({ message: error.message });
   }

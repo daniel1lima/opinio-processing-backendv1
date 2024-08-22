@@ -19,7 +19,7 @@ import { reviewsData } from "./data/reviews.js";
 import { reviewSummaries } from "./data/summaries.js";
 import Transaction from "./models/Transaction.js";
 import Company from "./models/Company.js";
-import Review from "./models/Review.js";
+import Reviews from "./models/Reviews.js";
 import ReviewSummary from "./models/ReviewSummary.js";
 
 // Config

@@ -41,6 +41,11 @@ app.use("/general", generalRoutes);
 app.use("/management", managementRoutes);
 app.use("/sales", salesRoutes);
 
+// Status route
+app.get("/status", (req, res) => {
+  res.json({ status: "Server is running" });
+});
+
 // DynamoDB Setup
 import AWS from "aws-sdk"; // Add AWS SDK import
 

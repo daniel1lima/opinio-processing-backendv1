@@ -1,8 +1,8 @@
-import AWS from 'aws-sdk';
+import { dynamoDB } from '../awsConfig.js';
 
 class User {
     constructor() {
-        this.dynamoDB = new AWS.DynamoDB(); // Ensure no local endpoint is set
+        this.dynamoDB = dynamoDB;
         this.UserSchema = { // Encapsulated schema
             TableName: 'Users',
             KeySchema: [

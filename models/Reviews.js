@@ -1,8 +1,8 @@
-import AWS from 'aws-sdk';
+import { dynamoDB } from '../awsConfig.js';
 
 class Reviews {
     constructor() {
-        this.dynamoDB = new AWS.DynamoDB(); // Ensure no local endpoint is set
+        this.dynamoDB = dynamoDB;
         this.tableName = 'Reviews';
         this.params = {
             TableName: this.tableName,

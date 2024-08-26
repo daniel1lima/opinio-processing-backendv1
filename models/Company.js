@@ -1,8 +1,8 @@
-import AWS from 'aws-sdk';
+import { dynamoDB } from '../awsConfig.js';
 
 class Company {
     constructor() {
-        this.dynamoDB = new AWS.DynamoDB();
+        this.dynamoDB = dynamoDB;
         this.tableName = 'Companies';
         this.params = {
             TableName: this.tableName,

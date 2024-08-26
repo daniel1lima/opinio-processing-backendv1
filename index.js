@@ -47,17 +47,24 @@ app.get("/status", (req, res) => {
 });
 
 // DynamoDB Setup
-import AWS from "aws-sdk"; // Add AWS SDK import
+import { dynamoDB, documentClient } from './awsConfig.js';
 
-// Replace Mongoose setup with DynamoDB setup
-AWS.config.update({
-  region: process.env.AWS_REGION, // Set your AWS region
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID, // Set your AWS access key
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY, // Set your AWS secret key
-  ...(process.env.USE_LOCAL_DYNAMODB === 'true' && { endpoint: process.env.DYNAMODB_URL })
+dynamoDB.listTables({}, (err, data) => {
+  if (err) {
+    console.error("Unable to connect to DynamoDB. Error JSON:", JSON.stringify(err, null, 2));
+  } else {
+    console.log("Connected to DynamoDB. Tables:", JSON.stringify(data, null, 2));
+    data.TableNames.forEach(async (tableName) => {
+      dynamoDB.describeTable({ TableName: tableName }, (describeErr, describeData) => {
+        if (describeErr) {
+          console.error(`Error describing table ${tableName}. Error JSON:`, JSON.stringify(describeErr, null, 2));
+        } else {
+          console.log(`Table ${tableName} has ${describeData.Table.ItemCount} items.`);
+        }
+      });
+    });
+  }
 });
-
-const dynamoDB = new AWS.DynamoDB.DocumentClient(); // Create DynamoDB DocumentClient
 
 const PORT = process.env.PORT || 9000;
 

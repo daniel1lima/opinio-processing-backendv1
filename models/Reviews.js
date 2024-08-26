@@ -2,10 +2,7 @@ import AWS from 'aws-sdk';
 
 class Reviews {
     constructor() {
-        this.dynamoDB = new AWS.DynamoDB({
-            region: 'us-west-2',
-            endpoint: 'http://localhost:8000' // Point to local DynamoDB
-        });
+        this.dynamoDB = new AWS.DynamoDB(); // Ensure no local endpoint is set
         this.tableName = 'Reviews';
         this.params = {
             TableName: this.tableName,
@@ -129,21 +126,43 @@ class Reviews {
         });
     }
 
-    fetchAllReviewsByCompanyId(companyId, page, pageSize) {
+    fetchPaginatedReviewsByCompanyId(companyId, page, pageSize) {
         const params = {
             TableName: this.tableName,
             KeyConditionExpression: 'company_id = :company_id',
             ExpressionAttributeValues: {
                 ':company_id': { S: companyId }
-            },
-            Limit: pageSize,
-            ExclusiveStartKey: page > 1 ? { company_id: { S: companyId }, review_id: { S: `${companyId}-${(page - 1) * pageSize}` } } : undefined
+            }
         };
 
         return new Promise((resolve, reject) => {
             this.dynamoDB.query(params, (err, data) => {
                 if (err) {
                     console.error("Unable to fetch reviews. Error JSON:", JSON.stringify(err, null, 2));
+                    reject(err);
+                } else {
+                    const reviews = data.Items.map(item => this.formatDynamoDBResponse(item));
+                    const startIndex = (page - 1) * pageSize;
+                    const paginatedReviews = reviews.slice(startIndex, startIndex + pageSize);
+                    resolve(paginatedReviews);
+                }
+            });
+        });
+    }
+
+    fetchAllReviews(company_id) {
+        const params = {
+            TableName: this.tableName,
+            FilterExpression: 'company_id = :company_id',
+            ExpressionAttributeValues: {
+                ':company_id': { S: company_id }
+            },
+        };
+
+        return new Promise((resolve, reject) => {
+            this.dynamoDB.scan(params, (err, data) => {
+                if (err) {
+                    console.error("Unable to fetch all reviews. Error JSON:", JSON.stringify(err, null, 2));
                     reject(err);
                 } else {
                     const reviews = data.Items.map(item => this.formatDynamoDBResponse(item));

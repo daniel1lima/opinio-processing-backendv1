@@ -4,22 +4,6 @@ import Reviews from '../models/Reviews.js'; // Ensure to import the Reviews clas
 const reviewsModel = new Reviews(); // Create an instance of the Reviews class
 
 
-export const getAllReviews = async (req, res) => {
-  try {
-
-    const companyId = req.query.comp_id;
-
-    const reviews = await Review.find().select("-bert_embeddings");
-
-    console.log(reviews);
-     
-
-    res.status(200).json(reviews);
-  } catch (error) {
-    res.status(404).json({ message: error.message });
-  }
-};
-
 export const getReviewsByCompId = async (req, res) => {
   try {
     const companyId = req.query.company_id;
@@ -27,10 +11,10 @@ export const getReviewsByCompId = async (req, res) => {
     const pageSize = parseInt(req.query.page_size) || 10; // Default to 10 items per page
 
     // Use the fetchAllReviewsByCompanyId method with pagination
-    const reviews = await reviewsModel.fetchAllReviewsByCompanyId(companyId, page, pageSize);
+    const reviews = await reviewsModel.fetchPaginatedReviewsByCompanyId(companyId, page, pageSize);
     
-    if (reviews.length === 0) {
-      return res.status(404).json({ error: "No reviews found for the company ID provided." });
+    if (reviews.length === 0 && page === 1) {
+      return res.status(404).json({ error: "No reviews found for the company ID provided / the company ID is incorrect." });
     }
 
     // Get total count of reviews for pagination
@@ -50,7 +34,7 @@ export const getReviewsByCompId = async (req, res) => {
 export const getFrequencyReviewsByCompId = async (req, res) => {
   try {
     const companyId = req.query.company_id;
-    const reviews = await reviewsModel.fetchAllReviewsByCompanyId(companyId);
+    const reviews = await reviewsModel.fetchAllReviews(companyId);
 
     // Initialize frequency objects
     const allTime = {};

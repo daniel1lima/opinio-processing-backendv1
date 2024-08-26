@@ -49,7 +49,7 @@ AWS.config.update({
   region: process.env.AWS_REGION, // Set your AWS region
   accessKeyId: process.env.AWS_ACCESS_KEY_ID, // Set your AWS access key
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY, // Set your AWS secret key
-  endpoint: process.env.DYNAMODB_URL
+  ...(process.env.USE_LOCAL_DYNAMODB === 'true' && { endpoint: process.env.DYNAMODB_URL })
 });
 
 const dynamoDB = new AWS.DynamoDB.DocumentClient(); // Create DynamoDB DocumentClient

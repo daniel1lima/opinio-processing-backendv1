@@ -2,7 +2,7 @@ import AWS from 'aws-sdk';
 
 class User {
     constructor() {
-        this.dynamoDB = new AWS.DynamoDB();
+        this.dynamoDB = new AWS.DynamoDB(); // Ensure no local endpoint is set
         this.UserSchema = { // Encapsulated schema
             TableName: 'Users',
             KeySchema: [

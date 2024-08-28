@@ -209,7 +209,9 @@ class Reviews {
             assigned_label: item.assigned_label.L.map(label => label.S),
             named_labels: item.named_labels.L.map(label => label.S),
             sentiment: item.sentiment ? parseFloat(item.sentiment.N) : null,
-            polarity: item.polarity ? parseFloat(item.polarity.N) : null
+            polarity: item.polarity ? parseFloat(item.polarity.N) : null,
+            author_name: item.author_name.S,
+            author_image_url: item.author_image_url.S
         };
     }
 }
